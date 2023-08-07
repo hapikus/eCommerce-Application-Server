@@ -26,6 +26,7 @@
     "jsonwebtoken": "^9.0.1",
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.2",
+    "nodemailer": "^6.9.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

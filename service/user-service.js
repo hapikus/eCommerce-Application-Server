@@ -14,16 +14,27 @@ class UserService {
     }
     const bashPassword = await bcrypt.hash(password, 3);
     const activationLink = uuid.v4();
-
+    
     const user = await UserModel.create({email, password: bashPassword, firstName, lastName, activationLink});
-    await mailService.sendActivationMail(email, activationLink);
+    
+    // await mailService.sendActivationMail(email, activationLink);
 
     const userDto = new UserDto(user) 
     const tokens = tokenService.generateToken({...userDto});
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
     tokens.accessToken
+    // await activate(activationLink);
     return {...tokens, user: userDto};
+  }
+
+  async activate(activationLink) {
+    const user = await UserModel.findOne({activationLink});
+    if (!user) {
+      throw new Error(`Пользователь с ссылкой для активации ${activationLink} уже существует`);
+    }
+    user.isActivated = true;
+    await user.save();
   }
 }
 
