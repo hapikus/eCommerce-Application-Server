@@ -7,6 +7,7 @@ const tokenService = require("../service/token-service");
 const UserDto = require("../dtos/user-dto");
 
 const ApiError = require("../exceptions/api-error");
+const userModel = require("../models/user-model");
 
 class UserService {
   async registration(email, password, firstName, lastName) {
@@ -56,6 +57,27 @@ class UserService {
   async logout(refreshToken) {
     const token = await tokenService.removeToken(refreshToken);
     return token;
+  }
+
+  async refresh(refreshToken) {
+    if (!refreshToken) {
+      throw ApiError.UnaucthorizedError();
+    }
+    const userData = tokenService.validateRefreshToken(refreshToken);
+    const tokenFromDb = await tokenService.findToken(refreshToken);
+    if (!userData || !tokenFromDb) {
+      throw ApiError.UnaucthorizedError();
+    }
+    const user = await userModel.findById(userData.id)
+    const userDto = new UserDto(user);
+    const tokens = tokenService.generateToken({...userDto});
+    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    return {...tokens, user: userDto};
+  }
+
+  async getAllusers() {
+    const users = await userModel.find();
+    return users;
   }
 }
 

@@ -15,7 +15,6 @@ router.post(
 router.post("/login", body("email").isEmail(), userController.login);
 router.post("/logout", userController.logout);
 
-router.get("/activate/link", userController.activate);
 router.get("/refresh", userController.refresh);
 router.get("/users", userController.getUsers);
 
