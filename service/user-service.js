@@ -6,11 +6,13 @@ const mailService = require('./mail-service');
 const tokenService = require("../service/token-service");
 const UserDto = require("../dtos/user-dto");
 
+const ApiError = require("../exceptions/api-error");
+
 class UserService {
   async registration(email, password, firstName, lastName) {
     const candidate = await UserModel.findOne({email});
     if (candidate) {
-      throw new Error(`Пользователь с почтовым ящиком ${email} уже существует`);
+      throw ApiError.BadRequest(`Пользователь с почтовым ящиком ${email} уже существует`);
     }
     const bashPassword = await bcrypt.hash(password, 3);
     const activationLink = uuid.v4();
@@ -23,7 +25,6 @@ class UserService {
     const tokens = tokenService.generateToken({...userDto});
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
-    tokens.accessToken
     // await activate(activationLink);
     return {...tokens, user: userDto};
   }
@@ -31,10 +32,25 @@ class UserService {
   async activate(activationLink) {
     const user = await UserModel.findOne({activationLink});
     if (!user) {
-      throw new Error(`Пользователь с ссылкой для активации ${activationLink} уже существует`);
+      throw ApiError.BadRequest(`Пользователь с ссылкой для активации ${activationLink} уже существует`);
     }
     user.isActivated = true;
     await user.save();
+  }
+
+  async login(email, password) {
+    const user = await UserModel.findOne({email});
+    if (!user) {
+      throw ApiError.BadRequest(`Пользователь с почтовым ящиком ${email} не существует`);
+    }
+    const isPasswordEquels = await bcrypt.compare(password, user.password);
+    if (!isPasswordEquels) {
+      throw ApiError.BadRequest(`Неверный пароль`);
+    }
+    const userDto = new UserDto(user);
+    const tokens = tokenService.generateToken({...userDto});
+    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    return {...tokens, user: userDto};
   }
 }
 
