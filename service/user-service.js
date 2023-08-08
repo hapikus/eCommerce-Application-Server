@@ -18,22 +18,21 @@ class UserService {
     const bashPassword = await bcrypt.hash(password, 3);
     const activationLink = uuid.v4();
     
+    await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
     const user = await UserModel.create({email, password: bashPassword, firstName, lastName, activationLink});
     
-    // await mailService.sendActivationMail(email, activationLink);
-
     const userDto = new UserDto(user) 
     const tokens = tokenService.generateToken({...userDto});
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
-    // await activate(activationLink);
     return {...tokens, user: userDto};
   }
 
   async activate(activationLink) {
+    // todo Добавить проверку, что пользователь уже активирован
     const user = await UserModel.findOne({activationLink});
     if (!user) {
-      throw ApiError.BadRequest(`Пользователь с ссылкой для активации ${activationLink} уже существует`);
+      throw ApiError.BadRequest(`Некорректная ссылка активации`);
     }
     user.isActivated = true;
     await user.save();

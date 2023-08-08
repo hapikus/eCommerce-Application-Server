@@ -46,7 +46,9 @@ class UserController {
 
   async activate(req, res, next) {
     try {
-      
+      const activateLing = req.params.link;
+      await userService.activate(activateLing);
+      return res.status(200).json({'message': 'Пользователь успешно активирован'});
     } catch (e) {
       next(e);
     }

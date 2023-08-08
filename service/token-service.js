@@ -31,7 +31,7 @@ class TokenService {
   }
 
   async saveToken(userId, refreshToken) {
-    //! Спросить про авторизацию - если будет только один токен для пользователя - это ок или не ок?
+    // todo Спросить про авторизацию - если будет только один токен для пользователя - это ок или не ок?
     const tokenData = await tokenModel.findOne({user: userId});
     if (tokenData) {
       tokenData.refreshToken = refreshToken;
