@@ -41,12 +41,13 @@ class UserService {
   async login(email, password) {
     const user = await UserModel.findOne({email});
     if (!user) {
-      throw ApiError.BadRequest(`Пользователь с почтовым ящиком ${email} не существует`);
+      throw ApiError.BadRequest(`Пользователя не существует`);
     }
     const isPasswordEquels = await bcrypt.compare(password, user.password);
     if (!isPasswordEquels) {
       throw ApiError.BadRequest(`Неверный пароль`);
     }
+    
     const userDto = new UserDto(user);
     const tokens = tokenService.generateToken({...userDto});
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
@@ -77,6 +78,15 @@ class UserService {
   async getAllusers() {
     const users = await userModel.find();
     return users;
+  }
+
+  async getUser(refreshToken) {
+    const userTokenData = tokenService.validateRefreshToken(refreshToken);
+    if (userTokenData) {
+      const { email } = userTokenData
+      return await UserModel.findOne({email});
+    }
+    return {};
   }
 }
 
