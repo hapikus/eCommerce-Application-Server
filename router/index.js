@@ -8,10 +8,10 @@ const router = new Router();
 
 router.post(
   "/registration",
-  body('email').isEmail(),
-  body('password').isLength({min: 3, max: 32}),
   body('firstName').isLength({min: 2, max: 32}),
   body('lastName').isLength({min: 2, max: 32}),
+  body('password').isLength({min: 3, max: 32}),
+  body('email').isEmail(),
   userController.registration,
 );
 router.post("/login", body("email").isEmail(), userController.login);

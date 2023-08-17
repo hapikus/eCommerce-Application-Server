@@ -9,8 +9,7 @@ class UserController {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
       }
-      const {email, password, firstName, lastName} = req.body;
-      const userData = await userService.registration(email, password, firstName, lastName);
+      const userData = await userService.registration(req.body);
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,

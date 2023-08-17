@@ -2,6 +2,8 @@ const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 
 const UserModel = require('../models/user-model');
+const BillingAddressModel = require('../models/address/billing-model');
+const ShippingAddressModel = require('../models/address/shipping-model');
 const mailService = require('./mail-service');
 const tokenService = require("../service/token-service");
 const UserDto = require("../dtos/user-dto");
@@ -10,7 +12,27 @@ const ApiError = require("../exceptions/api-error");
 const userModel = require("../models/user-model");
 
 class UserService {
-  async registration(email, password, firstName, lastName) {
+  async registration(reqBody) {
+    console.log("🚀 ~ file: user-service.js:19 ~ UserService ~ registration ~ reqBody:", reqBody)
+    const {
+      firstName,
+      lastName,
+      email,
+      dob,
+      password,
+
+      defaultShippingCheck,
+      shipCountry,
+      shipCity,
+      shipStreet,
+      shipPostalCode,
+
+      defaultBillingCkeck,
+      billCountry,
+      billCity,
+      billStreet,
+      billPostalCode,
+    } = reqBody;
     const candidate = await UserModel.findOne({email});
     if (candidate) {
       throw ApiError.BadRequest(`Пользователь с почтовым ящиком ${email} уже существует`);
@@ -19,7 +41,34 @@ class UserService {
     const activationLink = uuid.v4();
     
     await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
-    const user = await UserModel.create({email, password: bashPassword, firstName, lastName, activationLink});
+    const shippingAddress = await ShippingAddressModel.create({
+      country: shipCountry,
+      city: shipCity,
+      street: shipStreet,
+      postalCode: shipPostalCode,
+      isDefault: defaultShippingCheck,
+    })
+    console.log("🚀 ~ file: user-service.js:50 ~ UserService ~ registration ~ defaultShipping:", defaultShipping)
+
+    const billingAddress = await BillingAddressModel.create({
+      country: billCountry || shipCountry,
+      city: billCity || shipCity,
+      street: billStreet || shipStreet,
+      postalCode: billPostalCode || shipPostalCode,
+      isDefault: defaultBillingCkeck,
+    })
+    console.log("🚀 ~ file: user-service.js:59 ~ UserService ~ registration ~ defaultBilling:", defaultBilling)
+
+    const user = await UserModel.create({
+      email, 
+      password: bashPassword, 
+      firstName, 
+      lastName, 
+      activationLink,
+      billingAddress: [billingAddress._id],
+      shippingAddress: [shippingAddress._id],
+      birthday: dob,
+    });
     
     const userDto = new UserDto(user) 
     const tokens = tokenService.generateToken({...userDto});

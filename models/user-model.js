@@ -10,6 +10,7 @@ const UserSchema = new Schema({
     billingAddress: [{type: Schema.Types.ObjectId, ref: 'BillingAddress'}],
     shippingAddress: [{type: Schema.Types.ObjectId, ref: 'ShippingAddress'}],
     orders: [{type: Schema.Types.ObjectId, ref: 'Order'}],
+    birthday: { type: Date },
 });
 
 module.exports = model('User', UserSchema);
