@@ -48,7 +48,6 @@ class UserService {
       postalCode: shipPostalCode,
       isDefault: defaultShippingCheck,
     })
-    console.log("🚀 ~ file: user-service.js:50 ~ UserService ~ registration ~ defaultShipping:", defaultShipping)
 
     const billingAddress = await BillingAddressModel.create({
       country: billCountry || shipCountry,
@@ -57,7 +56,6 @@ class UserService {
       postalCode: billPostalCode || shipPostalCode,
       isDefault: defaultBillingCkeck,
     })
-    console.log("🚀 ~ file: user-service.js:59 ~ UserService ~ registration ~ defaultBilling:", defaultBilling)
 
     const user = await UserModel.create({
       email, 
