@@ -9,7 +9,6 @@ const tokenService = require("../service/token-service");
 const UserDto = require("../dtos/user-dto");
 
 const ApiError = require("../exceptions/api-error");
-const userModel = require("../models/user-model");
 
 class UserService {
   async registration(reqBody) {

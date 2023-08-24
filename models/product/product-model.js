@@ -1,14 +1,49 @@
 const { Schema, model } = require("mongoose");
 
 const ProductSchema = new Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  sellingName: { type: String, required: true },
-  description: { type: String, required: true },
-  price: { type: Number, required: true }, // $/h
-  mainSkills: [{type: Schema.Types.ObjectId, ref: 'MainSkill'}],
-  subSkills: [{type: Schema.Types.ObjectId, ref: 'SubSkill'}],
-  imageUrl: { type: String },
-});
+  gameTitle: { type: String, required: true },
+  headerImg: { type: String },
+  screenshotHolders: [{ type: String }],
+  userReviewRows: [
+    {
+      ReviewSummary: { type: String },
+      ResponsiveHidden: { type: String },
+    },
+  ],
+  price: { type: String },
+  releaseDate: { type: String },
+  devCompany: { type: String },
+  descriptionShort: { type: String },
+  descriptionLong: { type: String },
+  category: [{ type: String }],
+  sysRequirementsMinimum: {
+    OS: { type: String },
+    Processor: { type: String },
+    Memory: { type: String },
+    Graphics: { type: String },
+    DirectX: { type: String },
+    Network: { type: String },
+    Storage: { type: String },
+    VRSupport: { type: String },
+  },
+  sysRequirementsMinimumFill: {
+    OS: { type: String },
+    Processor: { type: String },
+    Memory: { type: String },
+    Graphics: { type: String },
+    DirectX: { type: String },
+    Network: { type: String },
+    Storage: { type: String },
+  },
+  sysRequirementsRecommended: {
+    OS: { type: String },
+    Processor: { type: String },
+    Memory: { type: String },
+    Graphics: { type: String },
+    DirectX: { type: String },
+    Network: { type: String },
+    Storage: { type: String },
+  },
+}, { collection: "product" });
 
-module.exports = model("Product", ProductSchema);
+module.exports = model("product", ProductSchema);

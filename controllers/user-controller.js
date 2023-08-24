@@ -94,7 +94,7 @@ class UserController {
       const user = await userService.getUser(refreshToken);
       return res.json(user);
     } catch (e) {
-      console.log(e);
+      next(e);
     }
   }
 }
