@@ -20,9 +20,18 @@ router.post("/logout", userController.logout);
 
 router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
+
 router.get("/users", authMiddleware, userController.getUsers);
 router.get("/user", authMiddleware, userController.getUser);
+router.put("/user", userController.updateUser);
+
+router.get('/user/address/billing', userController.getBillingAddresses);
+router.put('/user/address/billing', userController.updateBillingAddresses);
+router.get('/user/address/shipping', userController.getShippingAddresses);
+router.put('/user/address/shipping', userController.updateShippingAddresses);
+router.delete('/user/address/:id', userController.deleteAddress);
 
 router.get("/product/:title", productController.getProduct);
+router.get("/random-products", productController.getRandProducts);
 
 module.exports = router;

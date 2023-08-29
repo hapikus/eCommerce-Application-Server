@@ -14,6 +14,19 @@ class ProductController {
       next(e);
     }
   }
+
+  async getRandProducts(req, res, next) {
+    try {
+      const { num } = req.query;
+      const products = await productService.getRandomProducts(Number(num));
+      if (!products) {
+        return next(ApiError.NotFound('No random products found'));
+      }
+      return res.json(products);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = new ProductController();

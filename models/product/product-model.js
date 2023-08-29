@@ -3,7 +3,7 @@ const { Schema, model } = require("mongoose");
 const ProductSchema = new Schema({
   gameTitle: { type: String, required: true },
   headerImg: { type: String },
-  screenshotHolders: [{ type: String }],
+  screenshotList: [{ type: String }],
   userReviewRows: [
     {
       ReviewSummary: { type: String },
@@ -14,7 +14,7 @@ const ProductSchema = new Schema({
   releaseDate: { type: String },
   devCompany: { type: String },
   descriptionShort: { type: String },
-  descriptionLong: { type: String },
+  descriptionLong: [{ type: String }],
   category: [{ type: String }],
   sysRequirementsMinimum: {
     OS: { type: String },

@@ -9,7 +9,16 @@ class ProductService {
     }
     return product;
   }
+
+  async getRandomProducts(num) {
+    const randomProducts = await ProductModel.aggregate([
+      { $sample: { size: num } },
+    ]);
+    if (!randomProducts || randomProducts.length === 0) {
+      throw ApiError.BadRequest('No random products found');
+    }
+    return randomProducts;
+  }
 }
 
 module.exports = new ProductService();
-
