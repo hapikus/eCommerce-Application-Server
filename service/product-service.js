@@ -19,6 +19,47 @@ class ProductService {
     }
     return randomProducts;
   }
+
+  async getProductsCatalog(pageNumber, pageLimit, sortColumn, sortDirection) {
+    const validSortColumns = ['gameTitle', 'price', 'devCompany'];
+    if (!validSortColumns.includes(sortColumn)) {
+      throw ApiError.BadRequest('Invalid sort_column');
+    }
+
+    const validSortDirections = ['up', 'down'];
+    if (!validSortDirections.includes(sortDirection)) {
+      throw new Error('Invalid sort_direction');
+    }
+
+    const skip = (pageNumber - 1) * pageLimit;
+    const limit = pageLimit;
+
+    try {
+      const query = ProductModel.find();
+    
+      if (sortColumn === 'gameTitle') {
+        query.sort({ gameTitle: sortDirection === 'up' ? 1 : -1 });
+      } 
+      if (sortColumn === 'price') {
+        query.sort({ price: sortDirection === 'up' ? 1 : -1 });
+      } 
+      if (sortColumn === 'devCompany') {
+        query.sort({ devCompany: sortDirection === 'up' ? 1 : -1 });
+      }
+    
+      query.skip(skip).limit(limit);
+    
+      const products = await query.exec();
+      const totalProducts = await ProductModel.countDocuments();
+    
+      return {
+        products,
+        totalProducts,
+      };
+    } catch (error) {
+      throw new Error('Error fetching products from the catalog');
+    }
+  }
 }
 
 module.exports = new ProductService();

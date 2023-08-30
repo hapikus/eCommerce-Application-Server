@@ -18,11 +18,29 @@ class ProductController {
   async getRandProducts(req, res, next) {
     try {
       const { num } = req.query;
-      const products = await productService.getRandomProducts(Number(num));
-      if (!products) {
+      const productsRandom = await productService.getRandomProducts(Number(num));
+      if (!productsRandom) {
         return next(ApiError.NotFound('No random products found'));
       }
-      return res.json(products);
+      return res.json(productsRandom);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getCatalogProducts(req, res, next) {
+    try {
+      const { pageNumber, pageLimit, sortColumn, sortDirection } = req.body;
+      const productsCatalog = await productService.getProductsCatalog(
+        pageNumber, 
+        pageLimit, 
+        sortColumn, 
+        sortDirection
+      );
+      if (!productsCatalog) {
+        return next(ApiError.NotFound('No products found'));
+      }
+      return res.json(productsCatalog);
     } catch (e) {
       next(e);
     }

@@ -31,7 +31,8 @@ router.get('/user/address/shipping', userController.getShippingAddresses);
 router.put('/user/address/shipping', userController.updateShippingAddresses);
 router.delete('/user/address/:id', userController.deleteAddress);
 
+router.get("/product/random", productController.getRandProducts);
+router.get("/product/catalog", productController.getCatalogProducts);
 router.get("/product/:title", productController.getProduct);
-router.get("/random-products", productController.getRandProducts);
 
 module.exports = router;
