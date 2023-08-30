@@ -140,19 +140,29 @@ class UserService {
     const { id, ...updateData } = updatedProfileData;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error('Invalid user ID');
+      throw ApiError.BadRequest('Invalid user ID');
     }
     const userData = await UserModel.findOne({ _id: id });
     if (!userData) {
-      throw new Error('User not found');
+      throw ApiError.BadRequest('User not found');
     }
 
     const user = await UserModel.findById(id);
+    if (updateData.email) {
+      const emailExists = await UserModel.findOne({ email: updateData.email });
+      if (emailExists && emailExists._id.toString() !== id) {
+        throw ApiError.BadRequest('Email address is already in use');
+      }
+      user.email = updateData.email;
+    }
     if (updateData.firstName) {
       user.firstName = updatedProfileData.firstName;
     }
     if (updateData.lastName) {
       user.lastName = updatedProfileData.lastName;
+    }
+    if (updateData.dob) {
+      user.birthday = updateData.dob;
     }
     if (updatedProfileData.password) {
       const hashedPassword = await bcrypt.hash(updatedProfileData.password, 3);
