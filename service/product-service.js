@@ -28,7 +28,7 @@ class ProductService {
 
     const validSortDirections = ['up', 'down'];
     if (!validSortDirections.includes(sortDirection)) {
-      throw new Error('Invalid sort_direction');
+      throw ApiError('Invalid sort_direction');
     }
 
     const skip = (pageNumber - 1) * pageLimit;
@@ -36,17 +36,14 @@ class ProductService {
 
     try {
       const query = ProductModel.find();
-    
-      if (sortColumn === 'gameTitle') {
-        query.sort({ gameTitle: sortDirection === 'up' ? 1 : -1 });
-      } 
-      if (sortColumn === 'price') {
-        query.sort({ price: sortDirection === 'up' ? 1 : -1 });
-      } 
-      if (sortColumn === 'devCompany') {
-        query.sort({ devCompany: sortDirection === 'up' ? 1 : -1 });
+      const sorters = {
+        default: () => ({}),
+        gameTitle: () => ({ gameTitle: sortDirection === 'up' ? 1 : -1 }),
+        price: () => ({ price: sortDirection === 'up' ? 1 : -1 }),
+        devCompany: () => ({ devCompany: sortDirection === 'up' ? 1 : -1 }),
       }
-    
+
+      query.sort( (sorters[sortColumn] || sorters.default)() ); 
       query.skip(skip).limit(limit);
     
       const products = await query.exec();
@@ -57,7 +54,7 @@ class ProductService {
         totalProducts,
       };
     } catch (error) {
-      throw new Error('Error fetching products from the catalog');
+      throw ApiError('Error fetching products from the catalog');
     }
   }
 }

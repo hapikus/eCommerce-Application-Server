@@ -98,6 +98,20 @@ class UserController {
     }
   }
 
+  async checkPassword(req, res, next) {
+    try {
+      const {refreshToken} = req.cookies;
+      const {password} = req.body;
+      const checkAnswer = await userService.checkPassword(refreshToken, password);
+      if (!checkAnswer) {
+        return res.status(400).json({ message: 'Incorrect password' });
+      }
+      return res.status(200).json({ message: 'Password is correct' });
+    } catch (e) {
+      next(e)
+    }
+  }
+
   async updateUser(req, res, next) {
     try {
       const { updateUserBody } = req.body;
@@ -158,6 +172,16 @@ class UserController {
     try {
       const addressId = req.params.id;
       const deleteResult = await userService.deleteAddress(addressId);
+      return res.json(deleteResult);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async deleteUser(req, res, next) {
+    try {
+      const { userId } = req.body;
+      const deleteResult = await userService.deleteUser(userId);
       return res.json(deleteResult);
     } catch (e) {
       next(e);

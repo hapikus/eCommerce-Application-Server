@@ -172,6 +172,17 @@ class UserService {
     return {user};
   }
 
+  async checkPassword(refreshToken, password) {
+    const userTokenData = tokenService.validateRefreshToken(refreshToken);
+    if (!userTokenData) {
+      throw ApiError.BadRequest('Incorrect token');
+    }
+    const { email } = userTokenData
+    const userData = await UserModel.findOne({email});
+    const isPasswordEqual = await bcrypt.compare(password, userData.password);
+    return isPasswordEqual;
+  }
+
   async getShippingAddresses(shippingAddressIds) {
     for (const id of shippingAddressIds) {
       try {
@@ -289,9 +300,6 @@ class UserService {
       throw ApiError.BadRequest('Address not found');
     }
 
-    const billAddressData = await BillingAddressModel.findById(addressId);
-    const shipAddressData = await ShippingAddressModel.findById(addressId);
-
     const users = await UserModel.find({
       $or: [
         { billingAddress: addressId },
@@ -313,6 +321,18 @@ class UserService {
     }
 
     return {success: true, message: 'Address deleted successfully'};
+  }
+
+  async deleteUser(userId) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw ApiError.BadRequest('Invalid user ID');
+    }
+    const user = await UserModel.findOne({ _id: userId });
+      if (!user) {
+      throw ApiError.BadRequest('User not found');
+    }
+    await UserModel.deleteOne({ _id: userId });
+    return { success: true, message: 'User deleted successfully' };
   }
 }
 

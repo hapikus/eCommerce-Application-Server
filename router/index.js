@@ -24,12 +24,14 @@ router.get("/refresh", userController.refresh);
 router.get("/users", authMiddleware, userController.getUsers);
 router.get("/user", authMiddleware, userController.getUser);
 router.put("/user", userController.updateUser);
+router.delete("/user", userController.deleteUser);
 
-router.get('/user/address/billing', userController.getBillingAddresses);
-router.put('/user/address/billing', userController.updateBillingAddresses);
-router.get('/user/address/shipping', userController.getShippingAddresses);
-router.put('/user/address/shipping', userController.updateShippingAddresses);
-router.delete('/user/address/:id', userController.deleteAddress);
+router.get('/user/address/billing', authMiddleware, userController.getBillingAddresses);
+router.put('/user/address/billing', authMiddleware, userController.updateBillingAddresses);
+router.post('/user/check-password', userController.checkPassword);
+router.get('/user/address/shipping', authMiddleware, userController.getShippingAddresses);
+router.put('/user/address/shipping', authMiddleware, userController.updateShippingAddresses);
+router.delete('/user/address/:id', authMiddleware, userController.deleteAddress);
 
 router.get("/product/random", productController.getRandProducts);
 router.get("/product/catalog", productController.getCatalogProducts);
