@@ -30,17 +30,27 @@ class ProductController {
 
   async getCatalogProducts(req, res, next) {
     try {
-      const { pageNumber, pageLimit, sortColumn, sortDirection } = req.body;
+      const { pageNumber, pageLimit, sortColumn, sortDirection, tags } = req.body;
       const productsCatalog = await productService.getProductsCatalog(
         pageNumber, 
         pageLimit, 
         sortColumn, 
-        sortDirection
+        sortDirection,
+        tags,
       );
       if (!productsCatalog) {
         return next(ApiError.NotFound('No products found'));
       }
       return res.json(productsCatalog);
+    } catch (e) {
+      next(e);
+    }
+  }
+  
+  async getAllCategories(_req, res, next) {
+    try {
+      const uniqueCategories = await productService.getAllCategories();
+      return res.json(uniqueCategories);
     } catch (e) {
       next(e);
     }

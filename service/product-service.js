@@ -20,7 +20,10 @@ class ProductService {
     return randomProducts;
   }
 
-  async getProductsCatalog(pageNumber, pageLimit, sortColumn, sortDirection) {
+  async getProductsCatalog(pageNumber, pageLimit, sortColumn, sortDirection, tags) {
+    console.log('pageNumber', pageNumber);
+    console.log('sortColumn', sortColumn);
+    console.log('tags', tags);
     const validSortColumns = ['gameTitle', 'price', 'devCompany'];
     if (!validSortColumns.includes(sortColumn)) {
       throw ApiError.BadRequest('Invalid sort_column');
@@ -28,7 +31,7 @@ class ProductService {
 
     const validSortDirections = ['up', 'down'];
     if (!validSortDirections.includes(sortDirection)) {
-      throw ApiError('Invalid sort_direction');
+      throw ApiError.BadRequest('Invalid sort_direction');
     }
 
     const skip = (pageNumber - 1) * pageLimit;
@@ -36,6 +39,11 @@ class ProductService {
 
     try {
       const query = ProductModel.find();
+
+      if (Array.isArray(tags) && tags.length > 0) {
+        query.where('category').all(tags);
+      }
+
       const sorters = {
         default: () => ({}),
         gameTitle: () => ({ gameTitle: sortDirection === 'up' ? 1 : -1 }),
@@ -47,15 +55,29 @@ class ProductService {
       query.skip(skip).limit(limit);
     
       const products = await query.exec();
-      const totalProducts = await ProductModel.countDocuments();
+
+      const countQuery = ProductModel.find();
+      if (Array.isArray(tags) && tags.length > 0) {
+        countQuery.where('category').all(tags);
+      }
+      const totalProducts = await countQuery.countDocuments();
     
       return {
         products,
         totalProducts,
       };
     } catch (error) {
-      throw ApiError('Error fetching products from the catalog');
+      throw ApiError.BadRequest('Error fetching products from the catalog');
     }
+  }
+
+  async getAllCategories() {
+    const uniqueCategories = await ProductModel.distinct('category');
+    if (!uniqueCategories) {
+      throw ApiError.BadRequest('No categories found');
+    }
+    const sortedCategories = uniqueCategories.filter((category) => !(category.includes('Steam') || category.includes('Valve')));
+    return sortedCategories;
   }
 }
 

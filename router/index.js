@@ -33,6 +33,7 @@ router.get('/user/address/shipping', authMiddleware, userController.getShippingA
 router.put('/user/address/shipping', authMiddleware, userController.updateShippingAddresses);
 router.delete('/user/address/:id', authMiddleware, userController.deleteAddress);
 
+router.get("/product/all-categories", productController.getAllCategories);
 router.get("/product/random", productController.getRandProducts);
 router.get("/product/catalog", productController.getCatalogProducts);
 router.get("/product/:title", productController.getProduct);
