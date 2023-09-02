@@ -114,6 +114,20 @@ class ProductService {
     );
     return sortedCategories;
   }
+
+  async searchGameTitles(query) {
+    try {
+      const searchResults = await ProductModel.find({
+        gameTitle: { $regex: new RegExp(query, 'i') },
+      })
+        .limit(5)
+        .select('headerImg gameTitle price discountPrice');
+
+      return searchResults;
+    } catch (error) {
+      throw ApiError.BadRequest('Error searching game titles');
+    }
+  }
 }
 
 module.exports = new ProductService();

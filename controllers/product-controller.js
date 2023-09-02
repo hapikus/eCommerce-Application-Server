@@ -73,6 +73,22 @@ class ProductController {
       next(e);
     }
   }
+
+  async searchProducts(req, res, next) {
+    try {
+      const { query } = req.query;
+      if (!query) {
+        return next(ApiError.BadRequest('Invalid search query'));
+      }  
+      const searchResults = await productService.searchGameTitles(query);  
+      if (!searchResults || searchResults.length === 0) {
+        return next(ApiError.BadReques('No matching game titles found'));
+      }  
+      return res.json(searchResults);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = new ProductController();

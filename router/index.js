@@ -37,6 +37,7 @@ router.get("/product/all-categories", productController.getAllCategories);
 router.get("/product/random", productController.getRandProducts);
 router.get("/product/random-discount", productController.getRandProductsWithDiscount);
 router.post("/product/catalog", productController.getCatalogProducts);
+router.get("/product/search", productController.searchProducts);
 router.get("/product/:title", productController.getProduct);
 
 module.exports = router;
