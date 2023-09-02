@@ -15,7 +15,7 @@ class ProductService {
       { $sample: { size: num } },
     ]);
     if (!randomProducts || randomProducts.length === 0) {
-      throw ApiError.BadRequest('No random products found');
+      throw ApiError.BadRequest("No random products found");
     }
     return randomProducts;
   }
@@ -29,71 +29,89 @@ class ProductService {
       },
       { $sample: { size: num } },
     ]);
-  
-    if (!randomProductsWithDiscount || randomProductsWithDiscount.length === 0) {
-      throw ApiError.BadRequest('No random products with discount found');
-    }
-  
-    return randomProductsWithDiscount;
-  }
-  
-  async getProductsCatalog(pageNumber, pageLimit, sortColumn, sortDirection, tags) {
-    console.log('pageNumber', pageNumber);
-    console.log('sortColumn', sortColumn);
-    console.log('tags', tags);
-    const validSortColumns = ['gameTitle', 'price', 'devCompany'];
-    if (!validSortColumns.includes(sortColumn)) {
-      throw ApiError.BadRequest('Invalid sort_column');
+
+    if (
+      !randomProductsWithDiscount ||
+      randomProductsWithDiscount.length === 0
+    ) {
+      throw ApiError.BadRequest("No random products with discount found");
     }
 
-    const validSortDirections = ['up', 'down'];
+    return randomProductsWithDiscount;
+  }
+
+  async getProductsCatalog(
+    pageNumber,
+    pageLimit,
+    sortColumn,
+    sortDirection,
+    tags,
+    minPrice = 0,
+    maxPrice = Infinity,
+  ) {
+    const validSortColumns = ["gameTitle", "price", "devCompany"];
+    if (!validSortColumns.includes(sortColumn)) {
+      throw ApiError.BadRequest("Invalid sort_column");
+    }
+
+    const validSortDirections = ["up", "down"];
     if (!validSortDirections.includes(sortDirection)) {
-      throw ApiError.BadRequest('Invalid sort_direction');
+      throw ApiError.BadRequest("Invalid sort_direction");
     }
 
     const skip = (pageNumber - 1) * pageLimit;
     const limit = pageLimit;
 
+    const priceFilter = {
+      '$gte': minPrice,
+      '$lte': maxPrice,
+    };
+
     try {
       const query = ProductModel.find();
 
       if (Array.isArray(tags) && tags.length > 0) {
-        query.where('category').all(tags);
+        query.where("category").all(tags);
       }
+
+      query.where('price').gte(priceFilter['$gte']).lte(priceFilter['$lte']);
 
       const sorters = {
         default: () => ({}),
-        gameTitle: () => ({ gameTitle: sortDirection === 'up' ? 1 : -1 }),
-        price: () => ({ price: sortDirection === 'up' ? 1 : -1 }),
-        devCompany: () => ({ devCompany: sortDirection === 'up' ? 1 : -1 }),
-      }
+        gameTitle: () => ({ gameTitle: sortDirection === "up" ? 1 : -1 }),
+        price: () => ({ price: sortDirection === "up" ? 1 : -1 }),
+        devCompany: () => ({ devCompany: sortDirection === "up" ? 1 : -1 }),
+      };
 
-      query.sort( (sorters[sortColumn] || sorters.default)() ); 
+      query.sort((sorters[sortColumn] || sorters.default)());
       query.skip(skip).limit(limit);
-    
+
       const products = await query.exec();
 
       const countQuery = ProductModel.find();
       if (Array.isArray(tags) && tags.length > 0) {
-        countQuery.where('category').all(tags);
+        countQuery.where("category").all(tags);
       }
+      countQuery.where('price').gte(priceFilter['$gte']).lte(priceFilter['$lte']);
       const totalProducts = await countQuery.countDocuments();
-    
+
       return {
         products,
         totalProducts,
       };
     } catch (error) {
-      throw ApiError.BadRequest('Error fetching products from the catalog');
+      throw ApiError.BadRequest("Error fetching products from the catalog");
     }
   }
 
   async getAllCategories() {
-    const uniqueCategories = await ProductModel.distinct('category');
+    const uniqueCategories = await ProductModel.distinct("category");
     if (!uniqueCategories) {
-      throw ApiError.BadRequest('No categories found');
+      throw ApiError.BadRequest("No categories found");
     }
-    const sortedCategories = uniqueCategories.filter((category) => !(category.includes('Steam') || category.includes('Valve')));
+    const sortedCategories = uniqueCategories.filter(
+      (category) => !(category.includes("Steam") || category.includes("Valve"))
+    );
     return sortedCategories;
   }
 }

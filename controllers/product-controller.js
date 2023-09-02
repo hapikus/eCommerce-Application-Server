@@ -43,13 +43,15 @@ class ProductController {
 
   async getCatalogProducts(req, res, next) {
     try {
-      const { pageNumber, pageLimit, sortColumn, sortDirection, tags } = req.body;
+      const { pageNumber, pageLimit, sortColumn, sortDirection, tags, minPrice, maxPrice } = req.body;
       const productsCatalog = await productService.getProductsCatalog(
         pageNumber, 
         pageLimit, 
         sortColumn, 
         sortDirection,
         tags,
+        minPrice,
+        maxPrice,
       );
       if (!productsCatalog) {
         return next(ApiError.BadRequest('No products found'));

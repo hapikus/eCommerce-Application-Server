@@ -26,17 +26,17 @@ router.get("/user", authMiddleware, userController.getUser);
 router.put("/user", userController.updateUser);
 router.delete("/user", userController.deleteUser);
 
-router.get('/user/address/billing', authMiddleware, userController.getBillingAddresses);
+router.post('/user/address/billing', authMiddleware, userController.getBillingAddresses);
 router.put('/user/address/billing', authMiddleware, userController.updateBillingAddresses);
 router.post('/user/check-password', userController.checkPassword);
-router.get('/user/address/shipping', authMiddleware, userController.getShippingAddresses);
+router.post('/user/address/shipping', authMiddleware, userController.getShippingAddresses);
 router.put('/user/address/shipping', authMiddleware, userController.updateShippingAddresses);
 router.delete('/user/address/:id', authMiddleware, userController.deleteAddress);
 
 router.get("/product/all-categories", productController.getAllCategories);
 router.get("/product/random", productController.getRandProducts);
 router.get("/product/random-discount", productController.getRandProductsWithDiscount);
-router.get("/product/catalog", productController.getCatalogProducts);
+router.post("/product/catalog", productController.getCatalogProducts);
 router.get("/product/:title", productController.getProduct);
 
 module.exports = router;
