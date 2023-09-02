@@ -116,12 +116,6 @@ class UserController {
     try {
       const { updateUserBody } = req.body;
       const userData = await userService.updateUser(updateUserBody);
-      res.cookie("refreshToken", userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
-      });
       return res.json(userData);
     } catch (e) {
       next(e)

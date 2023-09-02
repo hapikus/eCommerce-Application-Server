@@ -20,6 +20,23 @@ class ProductService {
     return randomProducts;
   }
 
+  async getRandomProductsWithDiscount(num) {
+    const randomProductsWithDiscount = await ProductModel.aggregate([
+      {
+        $match: {
+          discountPrice: { $type: "number" },
+        },
+      },
+      { $sample: { size: num } },
+    ]);
+  
+    if (!randomProductsWithDiscount || randomProductsWithDiscount.length === 0) {
+      throw ApiError.BadRequest('No random products with discount found');
+    }
+  
+    return randomProductsWithDiscount;
+  }
+  
   async getProductsCatalog(pageNumber, pageLimit, sortColumn, sortDirection, tags) {
     console.log('pageNumber', pageNumber);
     console.log('sortColumn', sortColumn);

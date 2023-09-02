@@ -7,7 +7,7 @@ class ProductController {
       const { title } = req.params;
       const product = await productService.getProduct(title);
       if (!product) {
-        return next(ApiError.NotFound('Product not found'));
+        return next(ApiError.BadRequest('Product not found'));
       }
       return res.json(product);
     } catch (e) {
@@ -20,9 +20,22 @@ class ProductController {
       const { num } = req.query;
       const productsRandom = await productService.getRandomProducts(Number(num));
       if (!productsRandom) {
-        return next(ApiError.NotFound('No random products found'));
+        return next(ApiError.BadRequest('No random products found'));
       }
       return res.json(productsRandom);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getRandProductsWithDiscount(req, res, next) {
+    try {
+      const { num } = req.query;
+      const productsRanDiscount = await productService.getRandomProductsWithDiscount(Number(num));
+      if (!productsRanDiscount || productsRanDiscount.length === 0) {
+        return next(ApiError.BadRequest('No random products with discount found'));
+      }
+      return res.json(productsRanDiscount);
     } catch (e) {
       next(e);
     }
@@ -39,7 +52,7 @@ class ProductController {
         tags,
       );
       if (!productsCatalog) {
-        return next(ApiError.NotFound('No products found'));
+        return next(ApiError.BadRequest('No products found'));
       }
       return res.json(productsCatalog);
     } catch (e) {
@@ -50,6 +63,9 @@ class ProductController {
   async getAllCategories(_req, res, next) {
     try {
       const uniqueCategories = await productService.getAllCategories();
+      if (!uniqueCategories) {
+        return next(ApiError.BadRequest('No categories found'));
+      }
       return res.json(uniqueCategories);
     } catch (e) {
       next(e);

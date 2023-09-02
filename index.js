@@ -10,10 +10,17 @@ const mongoose = require("mongoose");
 const router = require('./router/index');
 const errorMiddleware = require('./middlewares/error-middleware');
 
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const options = require('./swagger');
+
+const specs = swaggerJSDoc(options);
+
 const PORT = process.env.PORT || 5000;
 const app = express();
 
 // middleware
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use(cors({
   origin: ['https://hapikus.github.io/', 'http://127.0.0.1:5173'],
   credentials: true,

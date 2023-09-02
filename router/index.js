@@ -35,6 +35,7 @@ router.delete('/user/address/:id', authMiddleware, userController.deleteAddress)
 
 router.get("/product/all-categories", productController.getAllCategories);
 router.get("/product/random", productController.getRandProducts);
+router.get("/product/random-discount", productController.getRandProductsWithDiscount);
 router.get("/product/catalog", productController.getCatalogProducts);
 router.get("/product/:title", productController.getProduct);
 
