@@ -183,6 +183,64 @@ class UserService {
     return isPasswordEqual;
   }
 
+  async addAndGetAllShippingAddress(refreshToken, country, city, street, postalCode, isDefault) {
+    const userTokenData = tokenService.validateRefreshToken(refreshToken);
+    if (!userTokenData) {
+      throw ApiError.BadRequest(`Invalid nrefreshToken`);
+    }
+
+    const newShippingAddress = await ShippingAddressModel.create({
+      country,
+      city,
+      street,
+      postalCode,
+      isDefault,
+    });
+
+    const { email } = userTokenData
+    const user = await UserModel.findOne({email});
+
+    user.shippingAddress.push(newShippingAddress._id);
+    await user.save();
+
+    const shippingAddresses = await ShippingAddressModel.find({ _id: { $in: user.shippingAddress } });
+    
+    if (!shippingAddresses) {
+      throw ApiError.BadRequest(`Incorrect shipping data`);
+    }
+
+    return shippingAddresses;
+  }
+
+  async addAndGetAllBillingAddress(refreshToken, country, city, street, postalCode, isDefault) {
+    const userTokenData = tokenService.validateRefreshToken(refreshToken);
+    if (!userTokenData) {
+      throw ApiError.BadRequest(`Invalid nrefreshToken`);
+    }
+
+    const newBillingAddress = await BillingAddressModel.create({
+      country,
+      city,
+      street,
+      postalCode,
+      isDefault,
+    });
+
+    const { email } = userTokenData
+    const user = await UserModel.findOne({email});
+
+    user.billingAddress.push(newBillingAddress._id);
+    await user.save();
+
+    const billingAddresses = await BillingAddressModel.find({ _id: { $in: user.billingAddress } });
+    
+    if (!billingAddresses) {
+      throw ApiError.BadRequest(`Incorrect shipping data`);
+    }
+
+    return billingAddresses;
+  }
+
   async getShippingAddresses(shippingAddressIds) {
     for (const id of shippingAddressIds) {
       try {

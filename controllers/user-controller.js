@@ -122,6 +122,42 @@ class UserController {
     }
   }
 
+  async addAndGetAllShippingAddress(req, res, next) {
+    try {
+      const { country, city, street, postalCode, isDefault } = req.body;
+      const { refreshToken } = req.cookies;
+      const allShipAddressesData = await userService.addAndGetAllShippingAddress(
+        refreshToken, 
+        country, 
+        city, 
+        street, 
+        postalCode, 
+        isDefault
+      );
+      return res.json(allShipAddressesData);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async addAndGetAllBillingAddress(req, res, next) {
+    try {
+      const { country, city, street, postalCode, isDefault } = req.body;
+      const { refreshToken } = req.cookies;
+      const allBillAddressesData = await userService.addAndGetAllBillingAddress(
+        refreshToken, 
+        country, 
+        city, 
+        street, 
+        postalCode, 
+        isDefault
+      );
+      return res.json(allBillAddressesData);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async getShippingAddresses(req, res, next) {
     try {
       const { shippingAddressIds } = req.body;
