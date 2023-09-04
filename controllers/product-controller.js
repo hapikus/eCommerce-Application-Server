@@ -74,6 +74,18 @@ class ProductController {
     }
   }
 
+  async getTopCategories(_req, res, next) {
+    try {
+      const topCategories = await productService.getTopCategories();
+      if (!topCategories) {
+        return next(ApiError.BadRequest('No top categories found'));
+      }
+      return res.json(topCategories);
+    } catch (e) {
+      next(e);
+    }
+  }
+  
   async searchProducts(req, res, next) {
     try {
       const { query } = req.query;

@@ -12,6 +12,7 @@ const ProductSchema = new Schema({
   ],
   price: { type: Number },
   discountPrice: { type: Number },
+  sortPrice: { type: Number },
   releaseDate: { type: String },
   devCompany: { type: String },
   descriptionShort: { type: String },

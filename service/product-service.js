@@ -74,7 +74,7 @@ class ProductService {
         query.where("category").all(tags);
       }
 
-      query.where('price').gte(priceFilter['$gte']).lte(priceFilter['$lte']);
+      query.where('sortPrice').gte(priceFilter['$gte']).lte(priceFilter['$lte']);
 
       const sorters = {
         default: () => ({}),
@@ -113,6 +113,29 @@ class ProductService {
       (category) => !(category.includes("Steam") || category.includes("Valve"))
     );
     return sortedCategories;
+  }
+
+  async getTopCategories() {
+    const products = await ProductModel.find();
+
+    const categoryCounts = {};
+    for (const item of products) {
+      for (const category of item.category) {
+        if (category.includes('Steam') || category.includes('Valve')) {
+          continue;
+        }
+        categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+      }
+    }
+  
+    const categoryArray = Object.keys(categoryCounts).map((category) => ({
+      name: category,
+      count: categoryCounts[category],
+    }));
+  
+    categoryArray.sort((a, b) => b.count - a.count);
+    const topCategories = categoryArray.slice(0, 8).map((category) => category.name);
+    return topCategories;
   }
 
   async searchGameTitles(query) {
