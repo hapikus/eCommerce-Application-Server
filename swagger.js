@@ -228,6 +228,23 @@ const option = {
             },
           },
         },
+        UserDto: {
+          type: 'object',
+          properties: {
+            email: {
+              type: 'string',
+              description: 'User email address',
+            },
+            id: {
+              type: 'string',
+              description: 'ID from user schema',
+            },
+            isActivated: {
+              type: 'string',
+              description: 'Flag indicating whether the user account is activated',
+            },
+          }
+        }
       },
     },
   },

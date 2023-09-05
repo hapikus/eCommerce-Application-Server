@@ -22,7 +22,7 @@ const app = express();
 // middleware
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use(cors({
-  origin: ['https://hapikus.github.io/', 'http://127.0.0.1:5173'],
+  origin: ['https://hapikus.github.io', 'http://127.0.0.1:5173', 'http://127.0.0.1:4173', 'http://localhost:5000'],
   credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   optionsSuccessStatus: 204,
