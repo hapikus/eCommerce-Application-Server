@@ -747,8 +747,8 @@ router.get("/refresh", userController.refresh);
 
 router.get("/users", authMiddleware, userController.getUsers);
 router.get("/user", authMiddleware, userController.getUser);
-router.put("/user", userController.updateUser);
-router.delete("/user", userController.deleteUser);
+router.put("/user", authMiddleware, userController.updateUser);
+router.delete("/user", authMiddleware, userController.deleteUser);
 
 router.post("/user/address/billing/addAndGetAll", authMiddleware, userController.addAndGetAllBillingAddress);
 router.post('/user/address/billing', authMiddleware, userController.getBillingAddresses);
