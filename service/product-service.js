@@ -115,7 +115,7 @@ class ProductService {
       const uniqueGenres = Array.from(new Set(products.flatMap((product) => product.gameGenre)))
       const uniqueTags = Array.from(new Set(products.flatMap((product) => product.category)));
 
-      const filtres = {
+      const filters = {
         themes: uniqueThemes,
         genres: uniqueGenres,
         tags: uniqueTags,
@@ -123,7 +123,7 @@ class ProductService {
 
       return {
         products,
-        filtres,
+        filters,
         totalProducts,
       };
     } catch (error) {

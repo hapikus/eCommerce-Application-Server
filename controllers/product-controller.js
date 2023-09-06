@@ -130,7 +130,7 @@ class ProductController {
       }  
       const searchResults = await productService.searchGameTitles(query);  
       if (!searchResults || searchResults.length === 0) {
-        return next(ApiError.BadReques('No matching game titles found'));
+        return next(ApiError.BadRequest('No matching game titles found'));
       }  
       return res.json(searchResults);
     } catch (e) {
