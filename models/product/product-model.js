@@ -17,6 +17,8 @@ const ProductSchema = new Schema({
   devCompany: { type: String },
   descriptionShort: { type: String },
   descriptionLong: [{ type: String }],
+  gameGenre: [{ type: String }],
+  gameTheme: [{ type: String }],
   category: [{ type: String }],
   sysRequirementsMinimum: {
     OS: { type: String },

@@ -287,7 +287,7 @@ class UserService {
 
   async updateShippingAddresses(shippingAddresses) {
     for (const address of shippingAddresses) {
-      const { id } = address;
+      const id = address._id;
       try {
         if (!mongoose.Types.ObjectId.isValid(id)) {
           throw new Error('Invalid shipping address ID');
@@ -303,9 +303,9 @@ class UserService {
 
     const updatedShippingAddresses = await Promise.all(
       shippingAddresses.map(async (addressUpdate) => {
-        const { id, ...updateData } = addressUpdate;
+        const { _id, ...updateData } = addressUpdate;
         const updatedShippingAddress = await ShippingAddressModel.findByIdAndUpdate(
-          id,
+          _id,
           updateData,
           { new: true }
         );
@@ -317,7 +317,7 @@ class UserService {
 
   async updateBillingAddresses(billingAddresses) {
     for (const address of billingAddresses) {
-      const { id } = address;
+      const id = address._id;
       try {
         if (!mongoose.Types.ObjectId.isValid(id)) {
           throw new Error('Invalid billing address ID');
@@ -333,11 +333,11 @@ class UserService {
 
     const updatedBillingAddresses = await Promise.all(
       billingAddresses.map(async (addressUpdate) => {
-        const { id, ...updateData } = addressUpdate;
+        const { _id, ...updateData } = addressUpdate;
         const updatedBillingAddress = await BillingAddressModel.findByIdAndUpdate(
-          id,
+          _id,
           updateData,
-          { new: true } // return the updated document after the changes have been applied
+          { new: true }
         );
         return updatedBillingAddress;
       })

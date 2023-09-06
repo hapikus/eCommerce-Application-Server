@@ -476,6 +476,70 @@ const router = new Router();
  *         description: Internal Server Error
  */
 
+//* GET product/top-first-genres
+/**
+ * @swagger
+ * /product/top-first-genres:
+ *   get:
+ *     summary: Get top product genres
+ *     description: Retrieve a list of the top product genres based on product counts.
+ *     tags:
+ *       - Product
+ *     responses:
+ *       200:
+ *         description: Successful response with a list of top the first product genres.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating that no top the first genres were found.
+ *       500:
+ *         description: Internal Server Error
+ */
+
+//* GET product/top-first-themes
+/**
+ * @swagger
+ * /product/top-first-themes:
+ *   get:
+ *     summary: Get top the first product themes
+ *     description: Retrieve a list of the top product themes based on product counts.
+ *     tags:
+ *       - Product
+ *     responses:
+ *       200:
+ *         description: Successful response with a list of top product themes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating that no top the first themes were found.
+ *       500:
+ *         description: Internal Server Error
+ */
+
 //* GET product/random
 /**
  * @swagger
@@ -595,6 +659,16 @@ const router = new Router();
  *                 items:
  *                   type: string
  *                 example: ["Single-player", "Online PvP"]
+ *               themes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["Strategy"]
+ *               genres:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["Simulation"]
  *               minPrice:
  *                 type: number
  *                 minimum: 0
@@ -619,6 +693,24 @@ const router = new Router();
  *                 totalProducts:
  *                   type: integer
  *                   description: The total number of products matching the filters.
+ *                 filters:
+ *                   type: object
+ *                   properties:
+ *                     tags:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       description: All unique tags from selected games.
+ *                     genres:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       description: All unique genres from selected games.
+ *                     themes:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       description: All unique themes from selected games.
  *       400:
  *         description: Bad Request
  *         content:
@@ -764,6 +856,9 @@ router.post('/user/check-password', userController.checkPassword);
 
 router.get("/product/all-categories", productController.getAllCategories);
 router.get("/product/top-categories", productController.getTopCategories);
+router.get("/product/top-first-genres", productController.getTopFirstGenres);
+router.get("/product/top-first-themes", productController.getTopFirstThemes);
+
 router.get("/product/random", productController.getRandProducts);
 router.get("/product/random-discount", productController.getRandProductsWithDiscount);
 router.post("/product/catalog", productController.getCatalogProducts);

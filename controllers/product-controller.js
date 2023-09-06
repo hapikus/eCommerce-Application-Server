@@ -43,13 +43,25 @@ class ProductController {
 
   async getCatalogProducts(req, res, next) {
     try {
-      const { pageNumber, pageLimit, sortColumn, sortDirection, tags, minPrice, maxPrice } = req.body;
+      const {
+        pageNumber,
+        pageLimit,
+        sortColumn,
+        sortDirection,
+        tags = [],
+        themes = [],
+        genres = [],
+        minPrice,
+        maxPrice
+      } = req.body;
       const productsCatalog = await productService.getProductsCatalog(
         pageNumber, 
         pageLimit, 
         sortColumn, 
         sortDirection,
         tags,
+        themes,
+        genres,
         minPrice,
         maxPrice,
       );
@@ -85,7 +97,31 @@ class ProductController {
       next(e);
     }
   }
-  
+
+  async getTopFirstGenres(_req, res, next) {
+    try {
+      const topGenres = await productService.getTopFirstGenres();
+      if (!topGenres) {
+        return next(ApiError.BadRequest('No top first genres found'));
+      }
+      return res.json(topGenres);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getTopFirstThemes(_req, res, next) {
+    try {
+      const topThemes = await productService.getTopFirstThemes();
+      if (!topThemes) {
+        return next(ApiError.BadRequest('No top first themes found'));
+      }
+      return res.json(topThemes);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async searchProducts(req, res, next) {
     try {
       const { query } = req.query;

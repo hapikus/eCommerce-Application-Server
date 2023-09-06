@@ -45,7 +45,9 @@ class ProductService {
     pageLimit,
     sortColumn,
     sortDirection,
-    tags,
+    tags = [],
+    themes = [],
+    genres = [],
     minPrice = 0,
     maxPrice = Infinity,
   ) {
@@ -70,6 +72,14 @@ class ProductService {
     try {
       const query = ProductModel.find();
 
+      if (Array.isArray(themes) && themes.length > 0) {
+        query.where("gameTheme").all(themes);
+      }
+
+      if (Array.isArray(genres) && genres.length > 0) {
+        query.where("gameGenre").all(genres);
+      }
+
       if (Array.isArray(tags) && tags.length > 0) {
         query.where("category").all(tags);
       }
@@ -89,14 +99,31 @@ class ProductService {
       const products = await query.exec();
 
       const countQuery = ProductModel.find();
+      if (Array.isArray(themes) && themes.length > 0) {
+        countQuery.where("gameTheme").all(themes);
+      }
+      if (Array.isArray(genres) && genres.length > 0) {
+        countQuery.where("gameGenre").all(genres);
+      }
       if (Array.isArray(tags) && tags.length > 0) {
         countQuery.where("category").all(tags);
       }
       countQuery.where('price').gte(priceFilter['$gte']).lte(priceFilter['$lte']);
       const totalProducts = await countQuery.countDocuments();
 
+      const uniqueThemes = Array.from(new Set(products.flatMap((product) => product.gameTheme)))
+      const uniqueGenres = Array.from(new Set(products.flatMap((product) => product.gameGenre)))
+      const uniqueTags = Array.from(new Set(products.flatMap((product) => product.category)));
+
+      const filtres = {
+        themes: uniqueThemes,
+        genres: uniqueGenres,
+        tags: uniqueTags,
+      }
+
       return {
         products,
+        filtres,
         totalProducts,
       };
     } catch (error) {
@@ -136,6 +163,44 @@ class ProductService {
     categoryArray.sort((a, b) => b.count - a.count);
     const topCategories = categoryArray.slice(0, 8).map((category) => category.name);
     return topCategories;
+  }
+
+  async getTopFirstGenres() {
+    const products = await ProductModel.find();
+
+    const firstGenreCounts = {};
+    for (const item of products) {
+      const firstGenre = item.gameGenre[0];
+      firstGenreCounts[firstGenre] = (firstGenreCounts[firstGenre] || 0) + 1;
+    }
+  
+    const genreArray = Object.keys(firstGenreCounts).map((genre) => ({
+      name: genre,
+      count: firstGenreCounts[genre],
+    }));
+  
+    genreArray.sort((a, b) => b.count - a.count);
+    const topFirstGenres = genreArray.slice(0, 8).map((genre) => genre.name);
+    return topFirstGenres;
+  }
+
+  async getTopFirstThemes() {
+    const products = await ProductModel.find();
+
+    const firstThemeCounts = {};
+    for (const item of products) {
+      const firstTheme = item.gameTheme[0];
+      firstThemeCounts[firstTheme] = (firstThemeCounts[firstTheme] || 0) + 1;
+    }
+
+    const themeArray = Object.keys(firstThemeCounts).map((theme) => ({
+      name: theme,
+      count: firstThemeCounts[theme],
+    }));
+
+    themeArray.sort((a, b) => b.count - a.count);
+    const topFirstThemes = themeArray.slice(0, 8).map((theme) => theme.name);
+    return topFirstThemes;
   }
 
   async searchGameTitles(query) {
