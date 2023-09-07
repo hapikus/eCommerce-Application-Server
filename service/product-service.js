@@ -110,10 +110,23 @@ class ProductService {
       }
       countQuery.where('price').gte(priceFilter['$gte']).lte(priceFilter['$lte']);
       const totalProducts = await countQuery.countDocuments();
+      
+      const productsAllQuery = ProductModel.find();
+      if (Array.isArray(themes) && themes.length > 0) {
+        productsAllQuery.where("gameTheme").all(themes);
+      }
+      if (Array.isArray(genres) && genres.length > 0) {
+        productsAllQuery.where("gameGenre").all(genres);
+      }
+      if (Array.isArray(tags) && tags.length > 0) {
+        productsAllQuery.where("category").all(tags);
+      }
+      productsAllQuery.where('price').gte(minPrice).lte(maxPrice);
+      const productsAll = await productsAllQuery.exec();
 
-      const uniqueThemes = Array.from(new Set(products.flatMap((product) => product.gameTheme)))
-      const uniqueGenres = Array.from(new Set(products.flatMap((product) => product.gameGenre)))
-      const uniqueTags = Array.from(new Set(products.flatMap((product) => product.category)));
+      const uniqueThemes = Array.from(new Set(productsAll.flatMap((product) => product.gameTheme))).sort();
+      const uniqueGenres = Array.from(new Set(productsAll.flatMap((product) => product.gameGenre))).sort();
+      const uniqueTags = Array.from(new Set(productsAll.flatMap((product) => product.category))).sort();
 
       const filters = {
         themes: uniqueThemes,
