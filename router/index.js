@@ -4,6 +4,7 @@ const {body} = require("express-validator");
 const userController = require("../controllers/user-controller");
 const productController = require("../controllers/product-controller");
 const authMiddleware = require('../middlewares/auth-middleware');
+const basketController = require("../controllers/basket-controller");
 
 const router = new Router();
 
@@ -167,6 +168,8 @@ const router = new Router();
  *     description: Check if the provided password matches the user's stored password.
  *     tags:
  *       - User
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -244,6 +247,8 @@ const router = new Router();
  *     description: Update the user's profile information.
  *     tags:
  *       - User
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -305,6 +310,8 @@ const router = new Router();
  *     description: Log the user out by removing the refresh token from the server. This effectively logs the user out and invalidates their token.
  *     tags:
  *       - Authentication
+ *     security:
+ *       - bearerAuth: [] 
  *     requestBody:
  *       required: false
  *     responses:
@@ -374,6 +381,8 @@ const router = new Router();
  *     description: Refresh the user's access tokens using the provided refresh token.
  *     tags:
  *       - Authentication
+ *     security:
+ *       - bearerAuth: [] 
  *     parameters:
  *       - name: refreshToken
  *         in: cookie
@@ -823,6 +832,87 @@ const router = new Router();
  *         description: Internal Server Error
  */
 
+//* POST baskets/create
+/**
+ * @swagger
+ * /baskets/create:
+ *   post:
+ *     summary: Create a new basket.
+ *     tags: [Basket]
+ *     responses:
+ *       200:
+ *         description: Successful response with a new basket ID.
+ *       400:
+ *         description: Bad request.
+ *       500:
+ *         description: Internal server error.
+ */
+
+//* POST baskets/add-to-user
+/**
+ * @swagger
+ * /baskets/add-to-user:
+ *   post:
+ *     summary: Add a basket to a user.
+ *     tags: [Basket]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               basketId:
+ *                 type: string
+ *             example:
+ *               basketId: "basketIdValue"
+ *     responses:
+ *       200:
+ *         description: Successful response with the updated user basket ID.
+ *       400:
+ *         description: Bad request.
+ *       401:
+ *         description: Unauthorized (user not authenticated).
+ *       500:
+ *         description: Internal server error.
+ */
+
+//* POST baskets/merge-baskets
+/**
+ * @swagger
+ * /baskets/merge-baskets:
+ *   post:
+ *     summary: Merge an anonymous basket into a user basket.
+ *     tags: [Basket]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               basketAnonId:
+ *                 type: string
+ *               basketUserId:
+ *                 type: string
+ *             example:
+ *               basketAnonId: "anonBasketIdValue"
+ *               basketUserId: "userBasketIdValue"
+ *     responses:
+ *       200:
+ *         description: Successful response with the merged user basket ID.
+ *       400:
+ *         description: Bad request.
+ *       401:
+ *         description: Unauthorized (user not authenticated).
+ *       500:
+ *         description: Internal server error.
+ */
+
 router.post(
   "/registration",
   body('firstName').isLength({min: 2, max: 32}),
@@ -864,5 +954,10 @@ router.get("/product/random-discount", productController.getRandProductsWithDisc
 router.post("/product/catalog", productController.getCatalogProducts);
 router.get("/product/search", productController.searchProducts);
 router.get("/product/:title", productController.getProduct);
+
+//! добавить authMiddleware
+router.post('/baskets/create', basketController.create);
+router.post('/baskets/add-to-user', basketController.addToUser);
+router.post('/baskets/merge-baskets', basketController.mergeBaskets);
 
 module.exports = router;

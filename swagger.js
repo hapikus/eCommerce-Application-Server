@@ -73,6 +73,10 @@ const option = {
               type: 'date',
               description: "User's date of birth",
             },
+            basketId: {
+              type: 'string',
+              description: "Unique basket ID",
+            },
           },
         },
         BillingAddress: {
@@ -242,6 +246,36 @@ const option = {
             isActivated: {
               type: 'string',
               description: 'Flag indicating whether the user account is activated',
+            },
+          }
+        },
+        Basket: {
+          type: 'object',
+          properties: {
+            basketId: {
+              type: 'string',
+              description: 'Unique basket ID',
+            },
+            items: {
+              type: 'array',
+              description: 'Array of objects representing products in the basket',
+              items: {
+                type: 'object',
+                properties:{
+                  gameTitle: {
+                    type: 'string',
+                    description: 'Game title',
+                  },
+                  quantity: {
+                    type: 'string',
+                    description: 'Quantity of the product',
+                  },
+                }
+              },
+            },
+            promo: {
+              type: 'string',
+              description: 'Promo code applied for the basket',
             },
           }
         }
