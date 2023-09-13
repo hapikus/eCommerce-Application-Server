@@ -98,6 +98,19 @@ class UserController {
     }
   }
 
+  async getUserBasket(req, res, next) {
+    try {
+      const { refreshToken } = req.cookies;
+      const basketId = await userService.getUserBasket(refreshToken);
+      if (!basketId) {
+        return next(ApiError.BadRequest('BasketId is not found'))
+      }
+      return res.json(basketId);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async checkPassword(req, res, next) {
     try {
       const {refreshToken} = req.cookies;

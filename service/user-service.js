@@ -136,6 +136,17 @@ class UserService {
     return {};
   }
 
+  async getUserBasket(refreshToken) {
+    const userTokenData = tokenService.validateRefreshToken(refreshToken);
+    if (!userTokenData) {
+      throw ApiError.BadRequest('Invalid refreshToken');
+    }
+    const { email } = userTokenData;
+    const userData = await UserModel.findOne({ email });
+    const { basketId } = userData;
+    return basketId
+  }
+
   async updateUser(updatedProfileData) {
     const { id, ...updateData } = updatedProfileData;
 

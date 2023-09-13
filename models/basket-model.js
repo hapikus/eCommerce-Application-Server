@@ -11,7 +11,7 @@ const basketSchema = new Schema({
       quantity: Number,
     },
   ],
-  promo: { type: String },
+  promo: { type: String, default: '' },
 });
 
 module.exports = model('Basket', basketSchema);

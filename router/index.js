@@ -170,6 +170,13 @@ const router = new Router();
  *       - User
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - name: refreshToken
+ *         in: cookie
+ *         required: true
+ *         description: The refresh token used to authenticate the user.
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -217,6 +224,13 @@ const router = new Router();
  *       - User
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - name: refreshToken
+ *         in: cookie
+ *         required: true
+ *         description: The refresh token used to authenticate the user.
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Successful response with user information.
@@ -236,6 +250,42 @@ const router = new Router();
  *                   description: A message indicating that the user is not authenticated.
  *       500:
  *         description: Internal Server Error
+ */
+
+//* GET user/get-basket
+/**
+ * @swagger
+ * /user/get-basket:
+ *   get:
+ *     summary: Get the user's basket ID.
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Retrieve the user's basket ID based on the provided refresh token.
+ *     parameters:
+ *       - name: refreshToken
+ *         in: cookie
+ *         required: true
+ *         description: The refresh token used to authenticate the user.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the user's basket ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 basketId:
+ *                   type: string
+ *                   description: The ID of the user's basket.
+ *       400:
+ *         description: Bad request. Possible reasons include missing or invalid refresh token.
+ *       404:
+ *         description: Not found. The user associated with the provided email was not found.
+ *       500:
+ *         description: Internal server error.
  */
 
 //* PUT user
@@ -835,7 +885,7 @@ const router = new Router();
 //* POST baskets/create
 /**
  * @swagger
- * /baskets/create:
+ * /basket/create:
  *   post:
  *     summary: Create a new basket.
  *     tags: [Basket]
@@ -851,7 +901,7 @@ const router = new Router();
 //* POST baskets/add-to-user
 /**
  * @swagger
- * /baskets/add-to-user:
+ * /basket/add-to-user:
  *   post:
  *     summary: Add a basket to a user.
  *     tags: [Basket]
@@ -882,7 +932,7 @@ const router = new Router();
 //* POST baskets/merge-baskets
 /**
  * @swagger
- * /baskets/merge-baskets:
+ * /basket/merge-baskets:
  *   post:
  *     summary: Merge an anonymous basket into a user basket.
  *     tags: [Basket]
@@ -913,6 +963,188 @@ const router = new Router();
  *         description: Internal server error.
  */
 
+//* DELETE basket/{basketId}/clear
+/**
+ * @swagger
+ * /basket/{basketId}/clear:
+ *   delete:
+ *     summary: Clear all items from a basket.
+ *     tags: [Basket]
+ *     description: Remove all items from the specified basket, making it empty.
+ *     parameters:
+ *       - name: basketId
+ *         in: path
+ *         required: true
+ *         description: The ID of the basket to be cleared.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Basket cleared successfully.
+ *       400:
+ *         description: Bad request. Possible reasons include the basket not found.
+ */
+
+//* POST baskets/{basketId}/add-item
+/**
+ * @swagger
+ * /basket/{basketId}/add-item:
+ *   post:
+ *     summary: Add an item to a basket
+ *     tags: [Basket]
+ *     description: Add a new item with a quantity of 1 to the specified basket.
+ *     parameters:
+ *       - name: basketId
+ *         in: path
+ *         required: true
+ *         description: The ID of the basket where the item will be added.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               gameTitle:
+ *                 type: string
+ *             example:
+ *               gameTitle: "EVE Online"
+ *     responses:
+ *       200:
+ *         description: The basket ID where the item was added.
+ *       400:
+ *         description: Bad request. Possible reasons include the basket not found or the game title already existing in the basket.
+ */
+
+//* PATCH basket/{basketId}/change-quantity
+/**
+ * @swagger
+ * /basket/{basketId}/change-quantity:
+ *   patch:
+ *     summary: Change the quantity of items in a basket
+ *     tags: [Basket]
+ *     description: Update the quantity of items in the specified basket for each gameTitle provided in the request.
+ *     parameters:
+ *       - name: basketId
+ *         in: path
+ *         required: true
+ *         description: The ID of the basket where item quantities will be updated.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               itemUpdates:
+ *                 type: object
+ *                 properties:
+ *                   "gameTitle 1":
+ *                     type: number
+ *                   "gameTitle 2":
+ *                     type: number
+ *                 example:
+ *                   "EVE Online": 2
+ *                   "Path of Exile": 3
+ *     responses:
+ *       200:
+ *         description: Quantity updated successfully.
+ *       400:
+ *         description: Bad request. Possible reasons include the basket not found or invalid gameTitles in itemUpdates.
+ */
+
+//* delete basket/{basketId}/remove-item
+/**
+ * @swagger
+ * /basket/{basketId}/remove-item:
+ *   delete:
+ *     summary: Remove a product from a basket.
+ *     tags: [Basket]
+ *     description: Remove a product with the specified gameTitle from the specified basket.
+ *     parameters:
+ *       - name: basketId
+ *         in: path
+ *         required: true
+ *         description: The ID of the basket from which the product will be removed.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               gameTitle:
+ *                 type: string
+ *             example:
+ *               gameTitle: "EVE Online"
+ *     responses:
+ *       200:
+ *         description: Product removed successfully.
+ *       400:
+ *         description: Bad request. Possible reasons include the basket not found or the product not found in the basket.
+ */
+
+//* POST basket/{basketId}/add-promo
+/**
+ * @swagger
+ * /basket/{basketId}/add-promo:
+ *   post:
+ *     summary: Add a promo to a basket
+ *     tags: [Basket]
+ *     description: Add a promo code to the specified basket.
+ *     parameters:
+ *       - name: basketId
+ *         in: path
+ *         required: true
+ *         description: The ID of the basket where the promo will be added.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               promo:
+ *                 type: string
+ *             example:
+ *               promo: "First order"
+ *     responses:
+ *       200:
+ *         description: The basket ID where the promo was added.
+ *       400:
+ *         description: Bad request. Possible reasons include the basket not found or an invalid promo code.
+ */
+
+//* POST basket/{basketId}/delete-promo
+/**
+ * @swagger
+ * /basket/{basketId}/delete-promo:
+ *   delete:
+ *     summary: Delete the promo from a basket
+ *     tags: [Basket]
+ *     description: Remove the promo code from the specified basket.
+ *     parameters:
+ *       - name: basketId
+ *         in: path
+ *         required: true
+ *         description: The ID of the basket from which the promo will be deleted.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The basket ID from which the promo was deleted.
+ *       400:
+ *         description: Bad request. Possible reasons include the basket not found or no promo code to delete.
+ */
+
 router.post(
   "/registration",
   body('firstName').isLength({min: 2, max: 32}),
@@ -929,6 +1161,7 @@ router.get("/refresh", userController.refresh);
 
 router.get("/users", authMiddleware, userController.getUsers);
 router.get("/user", authMiddleware, userController.getUser);
+router.get('/user/get-basket', authMiddleware, userController.getUserBasket);
 router.put("/user", authMiddleware, userController.updateUser);
 router.delete("/user", authMiddleware, userController.deleteUser);
 
@@ -955,9 +1188,16 @@ router.post("/product/catalog", productController.getCatalogProducts);
 router.get("/product/search", productController.searchProducts);
 router.get("/product/:title", productController.getProduct);
 
-//! добавить authMiddleware
-router.post('/baskets/create', basketController.create);
-router.post('/baskets/add-to-user', basketController.addToUser);
-router.post('/baskets/merge-baskets', basketController.mergeBaskets);
+router.post('/basket/create', basketController.create);
+router.post('/basket/add-to-user', authMiddleware, basketController.addToUser);
+router.post('/basket/merge-baskets', authMiddleware, basketController.mergeBaskets);
+router.delete('/basket/:basketId/clear', basketController.clearBasket);
+
+router.post('/basket/:basketId/add-item', basketController.addItem);
+router.patch('/basket/:basketId/change-quantity', basketController.changeQuantity);
+router.delete('/basket/:basketId/remove-item', basketController.removeItem);
+
+router.post('/basket/:basketId/add-promo', basketController.addPromo);
+router.delete('/basket/:basketId/delete-promo', basketController.deletePromo);
 
 module.exports = router;
