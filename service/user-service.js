@@ -144,7 +144,7 @@ class UserService {
     const { email } = userTokenData;
     const userData = await UserModel.findOne({ email });
     const { basketId } = userData;
-    return basketId
+    return basketId || '';
   }
 
   async updateUser(updatedProfileData) {

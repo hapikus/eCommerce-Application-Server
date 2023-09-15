@@ -257,21 +257,18 @@ const option = {
               description: 'Unique basket ID',
             },
             items: {
-              type: 'array',
-              description: 'Array of objects representing products in the basket',
-              items: {
-                type: 'object',
-                properties:{
-                  gameTitle: {
-                    type: 'string',
-                    description: 'Game title',
-                  },
-                  quantity: {
-                    type: 'string',
-                    description: 'Quantity of the product',
-                  },
-                }
-              },
+              type: 'object',
+              description: 'A map of game titles to their quantities in the basket.',
+              properties:{
+                gameTitle_one: {
+                  type: 'number',
+                  description: 'Game title',
+                },
+                gameTitle_two: {
+                  type: 'number',
+                  description: 'Game title',
+                },
+              }
             },
             promo: {
               type: 'string',

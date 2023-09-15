@@ -102,7 +102,7 @@ class UserController {
     try {
       const { refreshToken } = req.cookies;
       const basketId = await userService.getUserBasket(refreshToken);
-      if (!basketId) {
+      if (!basketId && basketId !== '') {
         return next(ApiError.BadRequest('BasketId is not found'))
       }
       return res.json(basketId);

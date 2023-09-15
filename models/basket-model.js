@@ -1,16 +1,15 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, MongooseMap } = require("mongoose");
 
 const basketSchema = new Schema({
   basketId: {
     type: String,
     unique: true,
   },
-  items: [
-    {
-      gameTitle: String,
-      quantity: Number,
-    },
-  ],
+  items: {
+    type: Map,
+    of: Number,
+    default: {},
+  },  
   promo: { type: String, default: '' },
 });
 

@@ -50,12 +50,25 @@ class ProductService {
       throw ApiError.BadRequest('userBasket basket not found');
     }
 
-    for (const [gameTitle, quantity] of Object.entries(anonBasket.items)) {
-      userBasket.items[gameTitle] = (userBasket.items[gameTitle] || 0) + quantity;
+    for (const [gameTitle, quantity] of anonBasket.items.entries()) {
+      if (userBasket.items.has(gameTitle)) {
+        userBasket.items.set(gameTitle, userBasket.items.get(gameTitle) + quantity);
+        continue;
+      }
+      userBasket.items.set(gameTitle, quantity);
     }
+    
     await userBasket.save();
     await BasketModel.findOneAndDelete({ basketId: basketAnonId });
     return basketUserId;
+  }
+
+  async getBasket(basketId) {
+    const basket = await BasketModel.findOne({ basketId }, { _id: 0 });
+    if (!basket) {
+      throw ApiError.BadRequest(`${basketId} basket not found`);
+    }
+    return basket;
   }
 
   async clearBasket(basketId) {
@@ -64,6 +77,7 @@ class ProductService {
       throw ApiError.BadRequest(`${basketId} basket not found`);
     }
     basket.items = [];
+    basket.promo = '';
     await basket.save();
     return basketId;
   }
@@ -73,14 +87,10 @@ class ProductService {
     if (!basket) {
       throw ApiError.BadRequest(`${basketId} basket not found`);
     }
-    const existingItemIndex = basket.items.findIndex(
-      (item) => item.gameTitle === gameTitle
-    );
-    if (existingItemIndex !== -1) {
+    if (basket.items && basket.items.has(gameTitle)) {
       throw ApiError.BadRequest(`${gameTitle} already exists in the basket!`);
-    } 
-    basket.items.push({ gameTitle, quantity: 1 });
-
+    }
+    basket.items.set(gameTitle, 1);
     await basket.save();
     return basketId;
   }
@@ -95,14 +105,13 @@ class ProductService {
       if (newQuantity < 0) {
         throw ApiError.BadRequest(`Incorrect new quantity`);
       }
-      const itemIndex = basket.items.findIndex((item) => item.gameTitle === gameTitle);
-      if (itemIndex === -1) {
+      if (!basket.items.has(gameTitle)) {
         throw ApiError.BadRequest(`${gameTitle} not found in the basket`);
-      } 
-      basket.items[itemIndex].quantity = newQuantity;
+      }
+      basket.items.set(gameTitle, newQuantity);
     }
     await basket.save();
-    return basketId
+    return basketId;
   }
 
   async removeItem(basketId, gameTitle) {
@@ -110,12 +119,10 @@ class ProductService {
     if (!basket) {
       throw ApiError.BadRequest(`${basketId} basket not found`);
     }
-    const itemIndex = basket.items.findIndex((item) => item.gameTitle === gameTitle);
-
-    if (itemIndex === -1) {
+    if (!basket.items.has(gameTitle)) {
       throw ApiError.BadRequest(`${gameTitle} not found in the basket`);
     }
-    basket.items.splice(itemIndex, 1);
+    basket.items.delete(gameTitle);
     await basket.save();
     return basketId;
   }

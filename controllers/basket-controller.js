@@ -41,6 +41,22 @@ class BasketController {
     }
   }
 
+  async getBasket(req, res, next) {
+    try {
+      const { basketId } = req.params;
+      if (!basketId) {
+        return next(ApiError.BadRequest('Invalid basketId'));
+      }
+      const basket = await basketService.getBasket(basketId);
+      if (!basket) {
+        return next(ApiError.NotFound(`Basket with ID ${basketId} not found`));
+      }
+      return res.json(basket);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async clearBasket(req, res, next) {
     try {
       const { basketId } = req.params;

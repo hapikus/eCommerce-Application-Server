@@ -963,6 +963,48 @@ const router = new Router();
  *         description: Internal server error.
  */
 
+//* GET basket/{basketId}/get-basket
+/**
+ * @swagger
+ * /basket/{basketId}/get-basket:
+ *   get:
+ *     summary: Get the user's basket.
+ *     tags: [Basket]
+ *     description: Retrieve the user's basket based on the provided basket ID.
+ *     parameters:
+ *       - name: basketId
+ *         in: path
+ *         required: true
+ *         description: The ID of the basket to retrieve.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the user's basket.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 basketId:
+ *                   type: string
+ *                   description: The ID of the user's basket.
+ *                 items:
+ *                   type: object
+ *                   additionalProperties:
+ *                     type: integer
+ *                   description: A map of game titles to their quantities in the basket.
+ *                 promo:
+ *                   type: string
+ *                   description: The promo code applied to the basket (default is an empty string).
+ *       400:
+ *         description: Bad request. Invalid basket ID.
+ *       404:
+ *         description: Not found. The specified basket was not found.
+ *       500:
+ *         description: Internal server error.
+ */
+
 //* DELETE basket/{basketId}/clear
 /**
  * @swagger
@@ -1061,7 +1103,7 @@ const router = new Router();
 /**
  * @swagger
  * /basket/{basketId}/remove-item:
- *   delete:
+ *   post:
  *     summary: Remove a product from a basket.
  *     tags: [Basket]
  *     description: Remove a product with the specified gameTitle from the specified basket.
@@ -1161,7 +1203,7 @@ router.get("/refresh", userController.refresh);
 
 router.get("/users", authMiddleware, userController.getUsers);
 router.get("/user", authMiddleware, userController.getUser);
-router.get('/user/get-basket', authMiddleware, userController.getUserBasket);
+router.get('/user/get-basket-id', authMiddleware, userController.getUserBasket);
 router.put("/user", authMiddleware, userController.updateUser);
 router.delete("/user", authMiddleware, userController.deleteUser);
 
@@ -1191,11 +1233,12 @@ router.get("/product/:title", productController.getProduct);
 router.post('/basket/create', basketController.create);
 router.post('/basket/add-to-user', authMiddleware, basketController.addToUser);
 router.post('/basket/merge-baskets', authMiddleware, basketController.mergeBaskets);
+router.get('/basket/:basketId/get-basket-items', basketController.getBasket);
 router.delete('/basket/:basketId/clear', basketController.clearBasket);
 
 router.post('/basket/:basketId/add-item', basketController.addItem);
 router.patch('/basket/:basketId/change-quantity', basketController.changeQuantity);
-router.delete('/basket/:basketId/remove-item', basketController.removeItem);
+router.post('/basket/:basketId/remove-item', basketController.removeItem);
 
 router.post('/basket/:basketId/add-promo', basketController.addPromo);
 router.delete('/basket/:basketId/delete-promo', basketController.deletePromo);
