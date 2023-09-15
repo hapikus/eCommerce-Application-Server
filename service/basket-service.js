@@ -1,4 +1,5 @@
 const BasketModel = require('../models/basket-model');
+const ProductModel = require('../models/product/product-model');
 const ApiError = require("../exceptions/api-error");
 const PROMO_CODES = process.env.PROMO_CODES;
 
@@ -57,7 +58,7 @@ class ProductService {
       }
       userBasket.items.set(gameTitle, quantity);
     }
-    
+
     await userBasket.save();
     await BasketModel.findOneAndDelete({ basketId: basketAnonId });
     return basketUserId;
@@ -69,6 +70,48 @@ class ProductService {
       throw ApiError.BadRequest(`${basketId} basket not found`);
     }
     return basket;
+  }
+
+  async getBasketFull(basketId) {
+    const basket = await BasketModel.findOne({ basketId }, { _id: 0 });
+    if (!basket) {
+      throw ApiError.BadRequest(`${basketId} basket not found`);
+    }
+
+    const basketPromos = {
+      SAVE10: (price) => {
+        return price * 0.9;
+      },
+      SAVE20: (price) => {
+        return price * 0.8;
+      },
+      "FIRST ORDER": (price) => {
+        return price * 0.75
+      }
+    };
+    const itemsDetails = {};
+    for (const [gameTitle, quantity] of basket.items.entries()) {
+      const game = await ProductModel.findOne({ gameTitle }); 
+
+      let promoPrice = game.sortPrice;
+      if (basket.promo && basketPromos.hasOwnProperty(basket.promo)) {
+        promoPrice = basketPromos[basket.promo](game.sortPrice)
+      }
+  
+      if (game) {
+        itemsDetails[gameTitle] = {
+          gameTitle: game.gameTitle,
+          descriptionShort: game.descriptionShort,
+          price: game.price,
+          discountPrice: game.discountPrice,
+          sortPrice: game.sortPrice,
+          promoPrice: Number(promoPrice.toFixed(2)),
+          basketQantity: quantity,
+        };
+      }
+    }
+
+    return itemsDetails;
   }
 
   async clearBasket(basketId) {

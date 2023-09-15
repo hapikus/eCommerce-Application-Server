@@ -963,10 +963,10 @@ const router = new Router();
  *         description: Internal server error.
  */
 
-//* GET basket/{basketId}/get-basket
+//* GET basket/{basketId}/get-basket-items
 /**
  * @swagger
- * /basket/{basketId}/get-basket:
+ * /basket/{basketId}/get-basket-items:
  *   get:
  *     summary: Get the user's basket.
  *     tags: [Basket]
@@ -994,6 +994,70 @@ const router = new Router();
  *                   additionalProperties:
  *                     type: integer
  *                   description: A map of game titles to their quantities in the basket.
+ *                 promo:
+ *                   type: string
+ *                   description: The promo code applied to the basket (default is an empty string).
+ *       400:
+ *         description: Bad request. Invalid basket ID.
+ *       404:
+ *         description: Not found. The specified basket was not found.
+ *       500:
+ *         description: Internal server error.
+ */
+
+//* GET basket/{basketId}/get-basket-full
+/**
+ * @swagger
+ * /basket/{basketId}/get-basket-full:
+ *   get:
+ *     summary: Get the user's full basket with game details and promotions.
+ *     tags:
+ *       - Basket
+ *     description: Retrieve the user's basket with game details and applied promotions based on the provided basket ID.
+ *     parameters:
+ *       - name: basketId
+ *         in: path
+ *         required: true
+ *         description: The ID of the basket to retrieve.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the user's full basket with game details and promotions.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 basketId:
+ *                   type: string
+ *                   description: The ID of the user's basket.
+ *                 items:
+ *                   type: object
+ *                   additionalProperties:
+ *                     type: object
+ *                     properties:
+ *                       gameTitle:
+ *                         type: string
+ *                         description: The title of the game.
+ *                       descriptionShort:
+ *                         type: string
+ *                         description: Short description of the game.
+ *                       price:
+ *                         type: number
+ *                         description: Original price of the game.
+ *                       discountPrice:
+ *                         type: number
+ *                         description: Discounted price of the game (if applicable).
+ *                       sortPrice:
+ *                         type: number
+ *                         description: Price after sorting.
+ *                       promoPrice:
+ *                         type: number
+ *                         description: Price after applying the promotion.
+ *                       basketQuantity:
+ *                         type: number
+ *                         description: Quantity of the game in the basket.
  *                 promo:
  *                   type: string
  *                   description: The promo code applied to the basket (default is an empty string).
@@ -1234,6 +1298,7 @@ router.post('/basket/create', basketController.create);
 router.post('/basket/add-to-user', authMiddleware, basketController.addToUser);
 router.post('/basket/merge-baskets', authMiddleware, basketController.mergeBaskets);
 router.get('/basket/:basketId/get-basket-items', basketController.getBasket);
+router.get('/basket/:basketId/get-basket-full', basketController.getBasketFull);
 router.delete('/basket/:basketId/clear', basketController.clearBasket);
 
 router.post('/basket/:basketId/add-item', basketController.addItem);

@@ -49,9 +49,25 @@ class BasketController {
       }
       const basket = await basketService.getBasket(basketId);
       if (!basket) {
-        return next(ApiError.NotFound(`Basket with ID ${basketId} not found`));
+        return next(ApiError.BadRequest(`Basket with ID ${basketId} not found`));
       }
       return res.json(basket);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getBasketFull(req, res, next) {
+    try {
+      const { basketId } = req.params;
+      if (!basketId) {
+        return next(ApiError.BadRequest('Invalid basketId'));
+      }
+      const basketFull = await basketService.getBasketFull(basketId);
+      if (!basketFull) {
+        return next(ApiError.BadRequest(`Basket with ID ${basketId} not found`));
+      }
+      return res.json(basketFull);
     } catch (e) {
       next(e);
     }
