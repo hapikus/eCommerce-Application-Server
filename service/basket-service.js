@@ -101,6 +101,7 @@ class ProductService {
       if (game) {
         itemsDetails[gameTitle] = {
           gameTitle: game.gameTitle,
+          headerImg: game.headerImg,
           descriptionShort: game.descriptionShort,
           price: game.price,
           discountPrice: game.discountPrice,
