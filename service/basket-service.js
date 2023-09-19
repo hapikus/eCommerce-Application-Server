@@ -176,7 +176,8 @@ class ProductService {
     if (!basket) {
       throw ApiError.BadRequest(`${basketId} basket not found`);
     }
-    const isPromoValid = PROMO_CODES.includes(promo);
+    const filteredPromos = PROMO_CODES.slice(1,-1).split(', ').filter(code => code === `"${promo}"`);
+    const isPromoValid = filteredPromos.length === 1;
     if (!isPromoValid) {
       throw ApiError.BadRequest(`Promo ${promo} is not found`);
     }
