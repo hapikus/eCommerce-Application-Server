@@ -1,3 +1,7 @@
+## Swagger documentation
+
+[Swagger](https://codefrondlers.store/api-docs/)
+
 ## Table of Contents
 
 - [JWT Authorization](#JWT_Authorization)
